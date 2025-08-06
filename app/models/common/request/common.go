@@ -1,7 +1,7 @@
 package request
 
 import (
-	"gorm.io/gorm"
+	"github.com/goravel/framework/contracts/database/orm"
 )
 
 // PageInfo Paging common input parameter structure
@@ -11,20 +11,17 @@ type PageInfo struct {
 	Keyword  string `json:"keyword" form:"keyword"`   // 关键字
 }
 
-func (r *PageInfo) Paginate() func(db *gorm.DB) *gorm.DB {
-	return func(db *gorm.DB) *gorm.DB {
-		if r.Page <= 0 {
-			r.Page = 1
-		}
-		switch {
-		case r.PageSize > 100:
-			r.PageSize = 100
-		case r.PageSize <= 0:
-			r.PageSize = 10
-		}
-		offset := (r.Page - 1) * r.PageSize
-		return db.Offset(offset).Limit(r.PageSize)
+func (r *PageInfo) Paginate(q orm.Query, dest any, total *int64) error {
+	if r.Page <= 0 {
+		r.Page = 1
 	}
+	switch {
+	case r.PageSize > 100:
+		r.PageSize = 100
+	case r.PageSize <= 0:
+		r.PageSize = 10
+	}
+	return q.Paginate(r.Page, r.PageSize, dest, total)
 }
 
 // GetById Find by id structure
