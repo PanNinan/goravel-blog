@@ -2,8 +2,10 @@ package controllers
 
 import (
 	"github.com/go-viper/mapstructure/v2"
+	"github.com/goravel/framework/contracts/event"
 	"github.com/goravel/framework/contracts/http"
 	"github.com/goravel/framework/facades"
+	"goravel-blog/app/events"
 	"goravel-blog/app/models"
 	"goravel-blog/app/models/common/request"
 	"goravel-blog/app/models/common/response"
@@ -61,12 +63,19 @@ func (r *CategoryController) Store(ctx http.Context) http.Response {
 	var category models.Category
 	err := mapstructure.Decode(input, &category)
 	if err != nil {
-		facades.Log().Error("category convert failed: %v", err)
+		facades.Log().Errorf("category convert failed: %v", err)
 		return response.InternalServerError(ctx, "failed")
 	}
 	if err = facades.Orm().WithContext(ctx).Query().Create(&category); err != nil {
 		facades.Log().Error("Create category failed: %v", err)
 		return response.InternalServerError(ctx, "Create category failed")
+	}
+	if err = facades.Event().Job(&events.CategoryChanged{}, []event.Arg{
+		{Type: "uint", Value: category.ID},
+		{Type: "string", Value: category.Name},
+		{Type: "string", Value: "create"},
+	}).Dispatch(); err != nil {
+		facades.Log().Errorf("Dispatch event failed: %v", err)
 	}
 	return response.Ok(ctx)
 }

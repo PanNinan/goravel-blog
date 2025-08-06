@@ -1,6 +1,7 @@
 package main
 
 import (
+	"github.com/goravel/framework/contracts/queue"
 	"os"
 	"os/signal"
 	"syscall"
@@ -37,6 +38,16 @@ func main() {
 
 	go func() {
 		if err := facades.Queue().Worker().Run(); err != nil {
+			facades.Log().Errorf("Queue run error: %v", err)
+		}
+	}()
+	go func() {
+		if err := facades.Queue().Worker(queue.Args{
+			Connection: "database",
+			Queue:      "default",
+			Concurrent: 1,
+			Tries:      1,
+		}).Run(); err != nil {
 			facades.Log().Errorf("Queue run error: %v", err)
 		}
 	}()
