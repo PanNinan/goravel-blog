@@ -16,7 +16,7 @@ func (kernel Kernel) Schedule() []schedule.Event {
 		facades.Schedule().Call(func() {
 			facades.Log().Debug(carbon.Now("PRC").ToDateTimeString())
 		}).EveryFiveMinutes(),
-		facades.Schedule().Command("app:clear-links").EverySecond(),
+		facades.Schedule().Command("app:clear-links").Daily(),
 	}
 }
 

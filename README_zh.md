@@ -1,127 +1,314 @@
 <div align="center">
 
-<img src="https://www.goravel.dev/logo.png?v=1.14.x" width="300" alt="Logo">
+<h1>Goravel Blog</h1>
 
-[![Doc](https://pkg.go.dev/badge/github.com/goravel/framework)](https://pkg.go.dev/github.com/goravel/framework)
-[![Go](https://img.shields.io/github/go-mod/go-version/goravel/framework)](https://go.dev/)
-[![Release](https://img.shields.io/github/release/goravel/framework.svg)](https://github.com/goravel/framework/releases)
-[![Test](https://github.com/goravel/framework/actions/workflows/test.yml/badge.svg)](https://github.com/goravel/framework/actions)
-[![Report Card](https://goreportcard.com/badge/github.com/goravel/framework)](https://goreportcard.com/report/github.com/goravel/framework)
-[![Codecov](https://codecov.io/gh/goravel/framework/branch/master/graph/badge.svg)](https://codecov.io/gh/goravel/framework)
-![License](https://img.shields.io/github/license/goravel/framework)
+<p>基于 <a href="https://github.com/goravel/goravel">Goravel</a> 构建的功能完善的博客系统 —— 一个 Laravel 风格的 Go Web 框架。</p>
 
-</div>
+[![Go Version](https://img.shields.io/github/go-mod/go-version/goravel/framework)](https://go.dev/)
+[![Goravel](https://img.shields.io/badge/Goravel-v1.16-blue)](https://www.goravel.dev/zh)
+[![License](https://img.shields.io/github/license/goravel/framework)](./LICENSE)
+[![CI](https://github.com/PanNinan/goravel-blog/actions/workflows/ci.yml/badge.svg)](https://github.com/PanNinan/goravel-blog/actions/workflows/ci.yml)
 
 [English](./README.md) | 中文
 
-# 关于 Goravel
+</div>
 
-Goravel 是一个功能完备、具有良好扩展能力的 Web 应用程序框架。作为一个起始脚手架帮助 Golang 开发者快速构建自己的应用。
+---
 
-框架风格与 [Laravel](https://github.com/laravel/laravel) 保持一致，让 Phper 不用学习新的框架，也可以愉快的玩转 Golang！致敬
-Laravel！
+## 📖 项目介绍
 
-欢迎 Star, PR, Issues！
+**Goravel Blog** 是使用 [Goravel](https://www.goravel.dev/zh) 框架实现的社区风格博客平台，涵盖用户认证、文章管理、分类管理、评论系统等核心功能。项目遵循 Laravel 风格的 MVC 约定，是熟悉 PHP/Laravel 的开发者上手 Go Web 开发的绝佳参考示例。
 
-## 快速上手
+---
+
+## 🏗️ 项目架构
 
 ```
-// 生成 APP_KEY
+goravel-blog/
+├── app/
+│   ├── console/          # Artisan 命令定义
+│   ├── events/           # 事件定义
+│   ├── grpc/             # gRPC 服务处理器
+│   ├── http/
+│   │   ├── controllers/  # HTTP 请求控制器
+│   │   │   ├── auth_controller.go      # 登录 / 登出 / 刷新 Token
+│   │   │   ├── user_controller.go      # 用户 CRUD + 当前用户
+│   │   │   ├── topic_controller.go     # 文章管理
+│   │   │   ├── category_controller.go  # 分类管理
+│   │   │   ├── reply_controller.go     # 评论管理
+│   │   │   └── link_controller.go      # 友情链接
+│   │   └── middleware/
+│   │       └── jwt.go    # JWT 认证中间件
+│   ├── jobs/             # 队列 Job 定义
+│   ├── listeners/        # 事件监听器
+│   ├── models/           # ORM 数据模型
+│   │   ├── user.go       # 用户模型
+│   │   ├── topic.go      # 文章模型
+│   │   ├── category.go   # 分类模型
+│   │   ├── reply.go      # 评论模型
+│   │   ├── link.go       # 友链模型
+│   │   ├── notification.go
+│   │   └── common/       # 统一响应封装
+│   └── providers/        # 服务提供者
+├── bootstrap/            # 应用启动引导
+├── config/               # 全局配置文件
+│   ├── app.go            # 应用基础配置
+│   ├── auth.go           # 认证守卫
+│   ├── cache.go          # 缓存驱动
+│   ├── database.go       # MySQL + Redis 连接
+│   ├── http.go           # HTTP 服务配置
+│   ├── jwt.go            # JWT 密钥与有效期
+│   ├── queue.go          # 队列（sync / database / redis）
+│   └── ...
+├── database/
+│   ├── migrations/       # 数据库迁移文件
+│   └── seeders/          # 数据填充
+├── resources/            # 视图模板（.tmpl）
+├── routes/
+│   ├── api.go            # REST API 路由
+│   ├── web.go            # Web 页面路由
+│   └── grpc.go           # gRPC 路由
+├── tests/                # 功能测试 & 单元测试
+├── Dockerfile            # 多阶段 Docker 构建
+├── docker-compose.yml    # 本地开发 Compose 配置
+└── main.go               # 程序入口
+```
+
+### 技术栈
+
+| 层级 | 技术选型 |
+|---|---|
+| 编程语言 | Go 1.23+ |
+| Web 框架 | Goravel v1.16（Laravel 风格） |
+| HTTP 路由 | Gin v1.10 |
+| ORM | GORM（通过 Goravel ORM Facade） |
+| 数据库 | MySQL 8.x |
+| 缓存 / 队列 | Redis |
+| 用户认证 | JWT（golang-jwt/jwt v5） |
+| 远程过程调用 | gRPC |
+| 任务调度 | Goravel Schedule（基于 cron） |
+| 队列工作者 | Goravel Queue（sync / database / redis 驱动） |
+| 容器化 | Docker + Docker Compose |
+
+---
+
+## ✨ 功能特性
+
+- **用户认证** — 基于 JWT 的登录、登出、Token 刷新、当前用户信息
+- **用户管理** — 增删改查、头像与个人简介
+- **文章（Topic）系统** — 文章创建、查看、修改、删除，支持分类、回复数、浏览数、Slug
+- **分类管理** — 文章多分类管理
+- **评论系统** — 关联文章的评论功能
+- **友情链接** — 友链管理模块
+- **任务调度** — 内置 cron 调度器（`facades.Schedule()`）
+- **队列任务** — 异步 Job 处理，支持 sync / database / redis 驱动
+- **gRPC 支持** — 可选 gRPC 服务端点
+- **优雅关闭** — 处理 OS 信号（SIGINT / SIGTERM）
+
+---
+
+## 🚀 快速上手
+
+### 环境要求
+
+- Go 1.23+
+- MySQL 8.x
+- Redis（可选，用于缓存/队列）
+- Docker & Docker Compose（可选）
+
+### 本地开发
+
+**1. 克隆仓库**
+
+```bash
+git clone https://github.com/PanNinan/goravel-blog.git
+cd goravel-blog
+```
+
+**2. 安装依赖**
+
+```bash
+go mod tidy
+```
+
+**3. 配置环境变量**
+
+复制示例配置文件并填写您的参数：
+
+```bash
+cp .env.example .env
+```
+
+关键配置项：
+
+```env
+APP_NAME=GravelBlog
+APP_ENV=local
+APP_KEY=           # 通过命令生成：go run . artisan key:generate
+APP_DEBUG=true
+APP_PORT=3000
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=goravel_blog
+DB_USERNAME=root
+DB_PASSWORD=secret
+
+REDIS_HOST=127.0.0.1
+REDIS_PORT=6379
+REDIS_PASSWORD=
+
+QUEUE_CONNECTION=sync
+
+JWT_SECRET=        # 您的 JWT 密钥
+```
+
+**4. 生成应用密钥**
+
+```bash
 go run . artisan key:generate
-
-// 定义路由
-facades.Route().Get("/", userController.Show)
-
-// 数据库查询
-facades.Orm().Query().With("Author").First(&user)
-
-// 任务调度
-facades.Schedule().Command("send:emails name").EveryMinute()
-
-// 记录 Log
-facades.Log().Debug(message)
-
-// 获取缓存
-value := facades.Cache().Get("goravel", "default")
-
-// 队列
-err := facades.Queue().Job(&jobs.Test{}, []queue.Arg{}).Dispatch()
 ```
 
-## 文档
+**5. 执行数据库迁移**
 
-在线文档 [https://www.goravel.dev/zh](https://www.goravel.dev/zh)
+```bash
+go run . artisan migrate
+```
 
-示例 [https://github.com/goravel/example](https://github.com/goravel/example)
+**6. 启动应用**
 
-> 优化文档，请提交 PR 至文档仓库 [https://github.com/goravel/docs](https://github.com/goravel/docs)
+```bash
+go run .
+```
 
-## 主要功能
+默认访问地址：`http://localhost:3000`
 
-|                                                                             |                                                               |                                                                    |                                                                   |                                                                               |
-|-----------------------------------------------------------------------------|---------------------------------------------------------------|--------------------------------------------------------------------|-------------------------------------------------------------------|-------------------------------------------------------------------------------|
-| [自定义配置](https://www.goravel.dev/zh/getting-started/configuration.html)      | [HTTP 服务](https://www.goravel.dev/zh/the-basics/routing.html) | [用户认证](https://www.goravel.dev/zh/security/authentication.html)    | [用户授权](https://www.goravel.dev/zh/security/authorization.html)    | [数据库 ORM](https://www.goravel.dev/zh/orm/getting-started.html)                |
-| [数据库迁移](https://www.goravel.dev/zh/orm/migrations.html)                     | [日志](https://www.goravel.dev/zh/the-basics/logging.html)      | [缓存](https://www.goravel.dev/zh/digging-deeper/cache.html)         | [Grpc](https://www.goravel.dev/zh/the-basics/grpc.html)           | [Artisan 命令行](https://www.goravel.dev/zh/digging-deeper/artisan-console.html) |
-| [任务调度](https://www.goravel.dev/zh/digging-deeper/task-scheduling.html)      | [队列](https://www.goravel.dev/zh/digging-deeper/queues.html)   | [事件系统](https://www.goravel.dev/zh/digging-deeper/event.html)       | [文件存储](https://www.goravel.dev/zh/digging-deeper/filesystem.html) | [邮件](https://www.goravel.dev/zh/digging-deeper/mail.html)                     |
-| [表单验证](https://www.goravel.dev/zh/the-basics/validation.html)               | [Mock](https://www.goravel.dev/zh/digging-deeper/mock.html)   | [Hash](https://www.goravel.dev/zh/security/hashing.html)           | [Crypt](https://www.goravel.dev/zh/security/encryption.html)      | [Carbon](https://www.goravel.dev/zh/digging-deeper/helpers.html)              |
-| [扩展包开发](https://www.goravel.dev/zh/digging-deeper/package-development.html) | [测试](https://www.goravel.dev/zh/testing/getting-started.html) | [本地化](https://www.goravel.dev/zh/digging-deeper/localization.html) | [Session](https://www.goravel.dev/zh/the-basics/session.html)     |                                                                               |
+---
 
-## 路线图
+### Docker Compose 一键启动
 
-[查看详情](https://github.com/goravel/goravel/issues?q=is%3Aissue+is%3Aopen)
+```bash
+# 构建并启动所有服务
+docker-compose up -d --build
 
-## 优秀扩展包
+# 查看日志
+docker-compose logs -f
 
-[查看详情](https://www.goravel.dev/zh/prologue/packages.html)
+# 停止服务
+docker-compose down
+```
 
-## 贡献者
+---
 
-这个项目的存在要归功于所有做出贡献的人，参与贡献请查看[贡献指南](https://www.goravel.dev/zh/prologue/contributions.html)。
+## 📡 API 接口
 
-<a href="https://github.com/hwbrzzl" target="_blank"><img src="https://avatars.githubusercontent.com/u/24771476?v=4" width="48" height="48"></a>
-<a href="https://github.com/DevHaoZi" target="_blank"><img src="https://avatars.githubusercontent.com/u/115467771?v=4" width="48" height="48"></a>
-<a href="https://github.com/kkumar-gcc" target="_blank"><img src="https://avatars.githubusercontent.com/u/84431594?v=4" width="48" height="48"></a>
-<a href="https://github.com/almas-x" target="_blank"><img src="https://avatars.githubusercontent.com/u/9382335?v=4" width="48" height="48"></a>
-<a href="https://github.com/merouanekhalili" target="_blank"><img src="https://avatars.githubusercontent.com/u/1122628?v=4" width="48" height="48"></a>
-<a href="https://github.com/hongyukeji" target="_blank"><img src="https://avatars.githubusercontent.com/u/23145983?v=4" width="48" height="48"></a>
-<a href="https://github.com/sidshrivastav" target="_blank"><img src="https://avatars.githubusercontent.com/u/28773690?v=4" width="48" height="48"></a>
-<a href="https://github.com/Juneezee" target="_blank"><img src="https://avatars.githubusercontent.com/u/20135478?v=4" width="48" height="48"></a>
-<a href="https://github.com/dragoonchang" target="_blank"><img src="https://avatars.githubusercontent.com/u/1432336?v=4" width="48" height="48"></a>
-<a href="https://github.com/dhanusaputra" target="_blank"><img src="https://avatars.githubusercontent.com/u/35093673?v=4" width="48" height="48"></a>
-<a href="https://github.com/mauri870" target="_blank"><img src="https://avatars.githubusercontent.com/u/10168637?v=4" width="48" height="48"></a>
-<a href="https://github.com/Marian0" target="_blank"><img src="https://avatars.githubusercontent.com/u/624592?v=4" width="48" height="48"></a>
-<a href="https://github.com/ahmed3mar" target="_blank"><img src="https://avatars.githubusercontent.com/u/12982325?v=4" width="48" height="48"></a>
-<a href="https://github.com/flc1125" target="_blank"><img src="https://avatars.githubusercontent.com/u/14297703?v=4" width="48" height="48"></a>
-<a href="https://github.com/zzpwestlife" target="_blank"><img src="https://avatars.githubusercontent.com/u/12382180?v=4" width="48" height="48"></a>
-<a href="https://github.com/juantarrel" target="_blank"><img src="https://avatars.githubusercontent.com/u/7213379?v=4" width="48" height="48"></a>
-<a href="https://github.com/Kamandlou" target="_blank"><img src="https://avatars.githubusercontent.com/u/77993374?v=4" width="48" height="48"></a>
-<a href="https://github.com/livghit" target="_blank"><img src="https://avatars.githubusercontent.com/u/108449432?v=4" width="48" height="48"></a>
-<a href="https://github.com/jeff87218" target="_blank"><img src="https://avatars.githubusercontent.com/u/29706585?v=4" width="48" height="48"></a>
-<a href="https://github.com/shayan-yousefi" target="_blank"><img src="https://avatars.githubusercontent.com/u/19957980?v=4" width="48" height="48"></a>
-<a href="https://github.com/zxdstyle" target="_blank"><img src="https://avatars.githubusercontent.com/u/38398954?v=4" width="48" height="48"></a>
-<a href="https://github.com/milwad-dev" target="_blank"><img src="https://avatars.githubusercontent.com/u/98118400?v=4" width="48" height="48"></a>
-<a href="https://github.com/mdanialr" target="_blank"><img src="https://avatars.githubusercontent.com/u/48054961?v=4" width="48" height="48"></a>
-<a href="https://github.com/KlassnayaAfrodita" target="_blank"><img src="https://avatars.githubusercontent.com/u/113383200?v=4" width="48" height="48"></a>
-<a href="https://github.com/YlanzinhoY" target="_blank"><img src="https://avatars.githubusercontent.com/u/102574758?v=4" width="48" height="48"></a>
-<a href="https://github.com/gouguoyin" target="_blank"><img src="https://avatars.githubusercontent.com/u/13517412?v=4" width="48" height="48"></a>
-<a href="https://github.com/dzham" target="_blank"><img src="https://avatars.githubusercontent.com/u/10853451?v=4" width="48" height="48"></a>
-<a href="https://github.com/praem90" target="_blank"><img src="https://avatars.githubusercontent.com/u/6235720?v=4" width="48" height="48"></a>
-<a href="https://github.com/vendion" target="_blank"><img src="https://avatars.githubusercontent.com/u/145018?v=4" width="48" height="48"></a>
-<a href="https://github.com/tzsk" target="_blank"><img src="https://avatars.githubusercontent.com/u/13273787?v=4" width="48" height="48"></a>
-<a href="https://github.com/ycb1986" target="_blank"><img src="https://avatars.githubusercontent.com/u/12908032?v=4" width="48" height="48"></a>
+Base URL：`http://localhost:3000`
 
-## 打赏
+### 认证接口
 
-开源项目的发展离不开您的支持，感谢微信打赏。
+| 方法 | 路径 | 说明 | 需要认证 |
+|------|------|------|:---:|
+| POST | `/auth/login` | 登录，返回 JWT Token | ✗ |
+| GET | `/auth/info` | 获取当前用户信息 | ✓ |
+| POST | `/auth/logout` | 登出 | ✓ |
+| POST | `/auth/refresh` | 刷新 JWT Token | ✓ |
 
-<p align="left"><img src="https://www.goravel.dev/reward-wechat.jpg" width="200"></p>
+### 用户接口
 
-## 群组
+| 方法 | 路径 | 说明 | 需要认证 |
+|------|------|------|:---:|
+| GET | `/users` | 用户列表 | ✗ |
+| GET | `/users/{id}` | 用户详情 | ✗ |
+| POST | `/users` | 创建用户 | ✗ |
+| PUT | `/users/{id}` | 更新用户 | ✗ |
+| DELETE | `/users/{id}` | 删除用户 | ✗ |
+| GET | `/users/current` | 当前登录用户 | ✓ |
 
-微信入群，请备注 Goravel
+### 分类接口
 
-<p align="left"><img src="https://www.goravel.dev/wechat.jpg" width="200"></p>
+| 方法 | 路径 | 说明 |
+|------|------|------|
+| GET | `/categories` | 分类列表 |
+| GET | `/categories/{id}` | 分类详情 |
+| POST | `/categories` | 创建分类 |
+| PUT | `/categories/{id}` | 更新分类 |
+| DELETE | `/categories/{id}` | 删除分类 |
 
-## 开源许可
+> **说明：** 请求体使用 `Content-Type: application/json`，JWT Token 通过 `Authorization: Bearer <token>` Header 传递。
 
-Goravel 框架是在 [MIT 许可](https://opensource.org/licenses/MIT) 下的开源软件。
+---
+
+## 🧪 运行测试
+
+```bash
+# 运行所有测试
+go test ./...
+
+# 详细输出
+go test -v ./...
+
+# 运行指定测试套件
+go test -v ./tests/feature/...
+```
+
+---
+
+## 🐳 生产部署
+
+### Docker 部署（推荐）
+
+项目使用多阶段 `Dockerfile` 构建最小化 Alpine 镜像：
+
+```bash
+# 构建镜像
+docker build -t goravel-blog:latest .
+
+# 运行容器
+docker run -d \
+  -p 3000:3000 \
+  --env-file .env \
+  goravel-blog:latest
+```
+
+### 手动编译部署
+
+```bash
+CGO_ENABLED=0 go build --ldflags "-s -w" -o goravel-blog .
+./goravel-blog
+```
+
+### SSH 服务器部署
+
+自动化部署需在 GitHub 仓库 Settings → Secrets 中添加以下变量：
+
+| Secret 名称 | 说明 |
+|------------|------|
+| `SERVER_HOST` | 服务器主机名或 IP |
+| `SERVER_USER` | SSH 登录用户名 |
+| `SERVER_SSH_KEY` | SSH 私钥 |
+| `SERVER_PORT` | SSH 端口（默认 22） |
+| `DEPLOY_PATH` | 服务器上的应用部署目录 |
+
+---
+
+## 🔄 CI/CD 流程
+
+本项目使用 GitHub Actions 实现自动化构建、测试与部署：
+
+- **CI 工作流**（`.github/workflows/ci.yml`）— 在每次推送或 PR 到 `main` / `develop` 分支时触发，执行 `go vet`、`go test` 和二进制编译验证。
+- **CD 工作流**（`.github/workflows/deploy.yml`）— 在 `main` 分支有推送时触发，构建并推送 Docker 镜像到镜像仓库，然后通过 SSH 部署到服务器。
+
+完整配置见 [`.github/workflows/`](.github/workflows/)。
+
+---
+
+## 🤝 参与贡献
+
+欢迎提交 Pull Request 和 Issue！请保持现有代码风格，并为新功能添加测试用例。
+
+---
+
+## 📄 开源许可
+
+本项目基于 [MIT 许可证](./LICENSE) 开源。

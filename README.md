@@ -1,129 +1,314 @@
 <div align="center">
 
-<img src="https://www.goravel.dev/logo.png?v=1.14.x" width="300" alt="Logo">
+<h1>Goravel Blog</h1>
 
-[![Doc](https://pkg.go.dev/badge/github.com/goravel/framework)](https://pkg.go.dev/github.com/goravel/framework)
-[![Go](https://img.shields.io/github/go-mod/go-version/goravel/framework)](https://go.dev/)
-[![Release](https://img.shields.io/github/release/goravel/framework.svg)](https://github.com/goravel/framework/releases)
-[![Test](https://github.com/goravel/framework/actions/workflows/test.yml/badge.svg)](https://github.com/goravel/framework/actions)
-[![Report Card](https://goreportcard.com/badge/github.com/goravel/framework)](https://goreportcard.com/report/github.com/goravel/framework)
-[![Codecov](https://codecov.io/gh/goravel/framework/branch/master/graph/badge.svg)](https://codecov.io/gh/goravel/framework)
-![License](https://img.shields.io/github/license/goravel/framework)
+<p>A full-featured blog system built with <a href="https://github.com/goravel/goravel">Goravel</a> — a Laravel-style Go web framework.</p>
+
+[![Go Version](https://img.shields.io/github/go-mod/go-version/goravel/framework)](https://go.dev/)
+[![Goravel](https://img.shields.io/badge/Goravel-v1.16-blue)](https://www.goravel.dev)
+[![License](https://img.shields.io/github/license/goravel/framework)](./LICENSE)
+[![CI](https://github.com/PanNinan/goravel-blog/actions/workflows/ci.yml/badge.svg)](https://github.com/PanNinan/goravel-blog/actions/workflows/ci.yml)
+
+[中文](./README_zh.md) | English
 
 </div>
 
-English | [中文](./README_zh.md)
+---
 
-## About Goravel
+## 📖 About
 
-Goravel is a web application framework with complete functions and good scalability. As a starting scaffolding to help
-Gopher quickly build their own applications.
+**Goravel Blog** is a community-style blog platform implemented with [Goravel](https://www.goravel.dev) framework. It covers essential features including user authentication, article management, category management, commenting system and more. The project follows Laravel-style MVC conventions, making it a great reference for Go developers familiar with PHP/Laravel.
 
-The framework style is consistent with [Laravel](https://github.com/laravel/laravel), let Php developer don't need to learn a
-new framework, but also happy to play around Golang! In tribute to Laravel!
+---
 
-Welcome to star, PR and issues！
-
-## Getting started
+## 🏗️ Architecture Overview
 
 ```
-// Generate APP_KEY
+goravel-blog/
+├── app/
+│   ├── console/          # Artisan command definitions
+│   ├── events/           # Event definitions
+│   ├── grpc/             # gRPC service handlers
+│   ├── http/
+│   │   ├── controllers/  # HTTP request handlers
+│   │   │   ├── auth_controller.go      # Login / logout / refresh token
+│   │   │   ├── user_controller.go      # User CRUD + current user
+│   │   │   ├── topic_controller.go     # Post management
+│   │   │   ├── category_controller.go  # Category management
+│   │   │   ├── reply_controller.go     # Comment management
+│   │   │   └── link_controller.go      # Friendly links
+│   │   └── middleware/
+│   │       └── jwt.go    # JWT authentication middleware
+│   ├── jobs/             # Queue job definitions
+│   ├── listeners/        # Event listeners
+│   ├── models/           # Eloquent-style ORM models
+│   │   ├── user.go       # User model
+│   │   ├── topic.go      # Post model
+│   │   ├── category.go   # Category model
+│   │   ├── reply.go      # Reply model
+│   │   ├── link.go       # Link model
+│   │   ├── notification.go
+│   │   └── common/       # Shared response helpers
+│   └── providers/        # Service providers
+├── bootstrap/            # Application bootstrap
+├── config/               # All configuration files
+│   ├── app.go            # Application settings
+│   ├── auth.go           # Auth guard
+│   ├── cache.go          # Cache driver
+│   ├── database.go       # MySQL + Redis connection
+│   ├── http.go           # HTTP server settings
+│   ├── jwt.go            # JWT secret & TTL
+│   ├── queue.go          # Queue (sync / database / redis)
+│   └── ...
+├── database/
+│   ├── migrations/       # Database migration files
+│   └── seeders/          # Database seeders
+├── resources/            # View templates (.tmpl)
+├── routes/
+│   ├── api.go            # REST API routes
+│   ├── web.go            # Web page routes
+│   └── grpc.go           # gRPC routes
+├── tests/                # Feature & unit tests
+├── Dockerfile            # Multi-stage Docker build
+├── docker-compose.yml    # Local development compose
+└── main.go               # Application entry point
+```
+
+### Technology Stack
+
+| Layer | Technology |
+|---|---|
+| Language | Go 1.23+ |
+| Framework | Goravel v1.16 (Laravel-style) |
+| HTTP Router | Gin v1.10 |
+| ORM | GORM (via Goravel ORM facade) |
+| Database | MySQL 8.x |
+| Cache / Queue | Redis |
+| Auth | JWT (golang-jwt/jwt v5) |
+| RPC | gRPC |
+| Task Scheduling | Goravel Schedule (cron-based) |
+| Queue Worker | Goravel Queue (sync / database / redis driver) |
+| Containerization | Docker + Docker Compose |
+
+---
+
+## ✨ Features
+
+- **User Authentication** — JWT-based login, logout, token refresh, current user info
+- **User Management** — CRUD, profile (avatar, introduction)
+- **Topic (Post) System** — Create, view, update, delete posts with category, reply count, view count, slug
+- **Category Management** — Post categorization with description
+- **Reply / Comment System** — Nested comments associated with topics
+- **Link Management** — Friendly links module
+- **Task Scheduling** — Built-in cron scheduler via `facades.Schedule()`
+- **Queue Workers** — Async job processing via sync, database, or redis driver
+- **gRPC Support** — Optional gRPC service endpoint
+- **Graceful Shutdown** — OS signal handling (SIGINT/SIGTERM)
+
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Go 1.23+
+- MySQL 8.x
+- Redis (optional, for cache/queue)
+- Docker & Docker Compose (optional)
+
+### Local Development
+
+**1. Clone the repository**
+
+```bash
+git clone https://github.com/PanNinan/goravel-blog.git
+cd goravel-blog
+```
+
+**2. Install dependencies**
+
+```bash
+go mod tidy
+```
+
+**3. Configure environment**
+
+Copy the example env file and fill in your values:
+
+```bash
+cp .env.example .env
+```
+
+Key variables:
+
+```env
+APP_NAME=GravelBlog
+APP_ENV=local
+APP_KEY=           # generate with: go run . artisan key:generate
+APP_DEBUG=true
+APP_PORT=3000
+
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=goravel_blog
+DB_USERNAME=root
+DB_PASSWORD=secret
+
+REDIS_HOST=127.0.0.1
+REDIS_PORT=6379
+REDIS_PASSWORD=
+
+QUEUE_CONNECTION=sync
+
+JWT_SECRET=        # your jwt secret
+```
+
+**4. Generate application key**
+
+```bash
 go run . artisan key:generate
-
-// Route
-facades.Route().Get("/", userController.Show)
-
-// ORM
-facades.Orm().Query().With("Author").First(&user)
-
-// Task Scheduling
-facades.Schedule().Command("send:emails name").EveryMinute()
-
-// Log
-facades.Log().Debug(message)
-
-// Cache
-value := facades.Cache().Get("goravel", "default")
-
-// Queues
-err := facades.Queue().Job(&jobs.Test{}, []queue.Arg{}).Dispatch()
 ```
 
-## Documentation
+**5. Run database migrations**
 
-Online documentation [https://www.goravel.dev](https://www.goravel.dev)
+```bash
+go run . artisan migrate
+```
 
-Example [https://github.com/goravel/example](https://github.com/goravel/example)
+**6. Start the application**
 
-> To optimize the documentation, please submit a PR to the documentation
-> repository [https://github.com/goravel/docs](https://github.com/goravel/docs)
+```bash
+go run .
+```
 
-## Main Function
+The server runs on `http://localhost:3000` by default.
 
-|                                                                                        |                                                                 |                                                                          |                                                                       |                                                                                |
-|----------------------------------------------------------------------------------------|-----------------------------------------------------------------|--------------------------------------------------------------------------|-----------------------------------------------------------------------|--------------------------------------------------------------------------------|
-| [Config](https://www.goravel.dev/getting-started/configuration.html)                   | [Http](https://www.goravel.dev/the-basics/routing.html)         | [Authentication](https://www.goravel.dev/security/authentication.html)   | [Authorization](https://www.goravel.dev/security/authorization.html)  | [Orm](https://www.goravel.dev/orm/getting-started.html)                        |
-| [Migrate](https://www.goravel.dev/orm/migrations.html)                                 | [Logger](https://www.goravel.dev/the-basics/logging.html)       | [Cache](https://www.goravel.dev/digging-deeper/cache.html)               | [Grpc](https://www.goravel.dev/the-basics/grpc.html)                  | [Artisan Console](https://www.goravel.dev/digging-deeper/artisan-console.html) |
-| [Task Scheduling](https://www.goravel.dev/digging-deeper/task-scheduling.html)         | [Queue](https://www.goravel.dev/digging-deeper/queues.html)     | [Event](https://www.goravel.dev/digging-deeper/event.html)               | [FileStorage](https://www.goravel.dev/digging-deeper/filesystem.html) | [Mail](https://www.goravel.dev/digging-deeper/mail.html)                       |
-| [Validation](https://www.goravel.dev/the-basics/validation.html)                       | [Mock](https://www.goravel.dev/testing/mock.html)               | [Hash](https://www.goravel.dev/security/hashing.html)                    | [Crypt](https://www.goravel.dev/security/encryption.html)             | [Carbon](https://www.goravel.dev/digging-deeper/helpers.html)                  |
-| [Package Development](https://www.goravel.dev/digging-deeper/package-development.html) | [Testing](https://www.goravel.dev/testing/getting-started.html) | [Localization](https://www.goravel.dev/digging-deeper/localization.html) | [Session](https://www.goravel.dev/the-basics/session.html)            |                                                                                |
+---
 
-## Roadmap
+### Docker Compose
 
-[For Detail](https://github.com/goravel/goravel/issues?q=is%3Aissue+is%3Aopen)
+```bash
+# Build and start all services
+docker-compose up -d --build
 
-## Excellent Extend Packages
+# View logs
+docker-compose logs -f
 
-[For Detail](https://www.goravel.dev/prologue/packages.html)
+# Stop services
+docker-compose down
+```
 
-## Contributors
+---
 
-This project exists thanks to all the people who contribute, to participate in the contribution, please see [Contribution Guide](https://www.goravel.dev/prologue/contributions.html).
+## 📡 API Reference
 
-<a href="https://github.com/hwbrzzl" target="_blank"><img src="https://avatars.githubusercontent.com/u/24771476?v=4" width="48" height="48"></a>
-<a href="https://github.com/DevHaoZi" target="_blank"><img src="https://avatars.githubusercontent.com/u/115467771?v=4" width="48" height="48"></a>
-<a href="https://github.com/kkumar-gcc" target="_blank"><img src="https://avatars.githubusercontent.com/u/84431594?v=4" width="48" height="48"></a>
-<a href="https://github.com/almas-x" target="_blank"><img src="https://avatars.githubusercontent.com/u/9382335?v=4" width="48" height="48"></a>
-<a href="https://github.com/merouanekhalili" target="_blank"><img src="https://avatars.githubusercontent.com/u/1122628?v=4" width="48" height="48"></a>
-<a href="https://github.com/hongyukeji" target="_blank"><img src="https://avatars.githubusercontent.com/u/23145983?v=4" width="48" height="48"></a>
-<a href="https://github.com/sidshrivastav" target="_blank"><img src="https://avatars.githubusercontent.com/u/28773690?v=4" width="48" height="48"></a>
-<a href="https://github.com/Juneezee" target="_blank"><img src="https://avatars.githubusercontent.com/u/20135478?v=4" width="48" height="48"></a>
-<a href="https://github.com/dragoonchang" target="_blank"><img src="https://avatars.githubusercontent.com/u/1432336?v=4" width="48" height="48"></a>
-<a href="https://github.com/dhanusaputra" target="_blank"><img src="https://avatars.githubusercontent.com/u/35093673?v=4" width="48" height="48"></a>
-<a href="https://github.com/mauri870" target="_blank"><img src="https://avatars.githubusercontent.com/u/10168637?v=4" width="48" height="48"></a>
-<a href="https://github.com/Marian0" target="_blank"><img src="https://avatars.githubusercontent.com/u/624592?v=4" width="48" height="48"></a>
-<a href="https://github.com/ahmed3mar" target="_blank"><img src="https://avatars.githubusercontent.com/u/12982325?v=4" width="48" height="48"></a>
-<a href="https://github.com/flc1125" target="_blank"><img src="https://avatars.githubusercontent.com/u/14297703?v=4" width="48" height="48"></a>
-<a href="https://github.com/zzpwestlife" target="_blank"><img src="https://avatars.githubusercontent.com/u/12382180?v=4" width="48" height="48"></a>
-<a href="https://github.com/juantarrel" target="_blank"><img src="https://avatars.githubusercontent.com/u/7213379?v=4" width="48" height="48"></a>
-<a href="https://github.com/Kamandlou" target="_blank"><img src="https://avatars.githubusercontent.com/u/77993374?v=4" width="48" height="48"></a>
-<a href="https://github.com/livghit" target="_blank"><img src="https://avatars.githubusercontent.com/u/108449432?v=4" width="48" height="48"></a>
-<a href="https://github.com/jeff87218" target="_blank"><img src="https://avatars.githubusercontent.com/u/29706585?v=4" width="48" height="48"></a>
-<a href="https://github.com/shayan-yousefi" target="_blank"><img src="https://avatars.githubusercontent.com/u/19957980?v=4" width="48" height="48"></a>
-<a href="https://github.com/zxdstyle" target="_blank"><img src="https://avatars.githubusercontent.com/u/38398954?v=4" width="48" height="48"></a>
-<a href="https://github.com/milwad-dev" target="_blank"><img src="https://avatars.githubusercontent.com/u/98118400?v=4" width="48" height="48"></a>
-<a href="https://github.com/mdanialr" target="_blank"><img src="https://avatars.githubusercontent.com/u/48054961?v=4" width="48" height="48"></a>
-<a href="https://github.com/KlassnayaAfrodita" target="_blank"><img src="https://avatars.githubusercontent.com/u/113383200?v=4" width="48" height="48"></a>
-<a href="https://github.com/YlanzinhoY" target="_blank"><img src="https://avatars.githubusercontent.com/u/102574758?v=4" width="48" height="48"></a>
-<a href="https://github.com/gouguoyin" target="_blank"><img src="https://avatars.githubusercontent.com/u/13517412?v=4" width="48" height="48"></a>
-<a href="https://github.com/dzham" target="_blank"><img src="https://avatars.githubusercontent.com/u/10853451?v=4" width="48" height="48"></a>
-<a href="https://github.com/praem90" target="_blank"><img src="https://avatars.githubusercontent.com/u/6235720?v=4" width="48" height="48"></a>
-<a href="https://github.com/vendion" target="_blank"><img src="https://avatars.githubusercontent.com/u/145018?v=4" width="48" height="48"></a>
-<a href="https://github.com/tzsk" target="_blank"><img src="https://avatars.githubusercontent.com/u/13273787?v=4" width="48" height="48"></a>
-<a href="https://github.com/ycb1986" target="_blank"><img src="https://avatars.githubusercontent.com/u/12908032?v=4" width="48" height="48"></a>
+Base URL: `http://localhost:3000`
 
-## Sponsor
+### Authentication
 
-Better development of the project is inseparable from your support, reward us by [Open Collective](https://opencollective.com/goravel).
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|:---:|
+| POST | `/auth/login` | Login, returns JWT token | ✗ |
+| GET | `/auth/info` | Get current user info | ✓ |
+| POST | `/auth/logout` | Logout | ✓ |
+| POST | `/auth/refresh` | Refresh JWT token | ✓ |
 
-<p align="left"><img src="https://www.goravel.dev/reward.png" width="200"></p>
+### Users
 
-## Group
+| Method | Endpoint | Description | Auth Required |
+|--------|----------|-------------|:---:|
+| GET | `/users` | List all users | ✗ |
+| GET | `/users/{id}` | Get user by ID | ✗ |
+| POST | `/users` | Create user | ✗ |
+| PUT | `/users/{id}` | Update user | ✗ |
+| DELETE | `/users/{id}` | Delete user | ✗ |
+| GET | `/users/current` | Get current logged-in user | ✓ |
 
-Welcome more discussion in Discord.
+### Categories
 
-[https://discord.gg/cFc5csczzS](https://discord.gg/cFc5csczzS)
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| GET | `/categories` | List categories |
+| GET | `/categories/{id}` | Get category by ID |
+| POST | `/categories` | Create category |
+| PUT | `/categories/{id}` | Update category |
+| DELETE | `/categories/{id}` | Delete category |
 
-## License
+> **Note:** Request payloads use `Content-Type: application/json`. JWT token should be passed via `Authorization: Bearer <token>` header.
 
-The Goravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+---
+
+## 🧪 Testing
+
+```bash
+# Run all tests
+go test ./...
+
+# Run with verbose output
+go test -v ./...
+
+# Run a specific test suite
+go test -v ./tests/feature/...
+```
+
+---
+
+## 🐳 Production Deployment
+
+### Docker (Recommended)
+
+The multi-stage `Dockerfile` produces a minimal Alpine-based image:
+
+```bash
+# Build image
+docker build -t goravel-blog:latest .
+
+# Run container
+docker run -d \
+  -p 3000:3000 \
+  --env-file .env \
+  goravel-blog:latest
+```
+
+### Manual Build
+
+```bash
+CGO_ENABLED=0 go build --ldflags "-s -w" -o goravel-blog .
+./goravel-blog
+```
+
+### Server Deployment via SSH
+
+For automated deployment, set the following GitHub Actions secrets:
+
+| Secret | Description |
+|--------|-------------|
+| `SERVER_HOST` | SSH server hostname or IP |
+| `SERVER_USER` | SSH username |
+| `SERVER_SSH_KEY` | SSH private key |
+| `SERVER_PORT` | SSH port (default: 22) |
+| `DEPLOY_PATH` | Application directory on server |
+
+---
+
+## 🔄 CI/CD
+
+This project uses GitHub Actions for automated build, test, and deployment.
+
+- **CI workflow** (`.github/workflows/ci.yml`) — triggered on every push/PR to `main` or `develop`: runs `go vet`, `go test`, and builds the binary.
+- **CD workflow** (`.github/workflows/deploy.yml`) — triggered on push to `main`: builds and pushes Docker image to registry, then deploys to server via SSH.
+
+See [`.github/workflows/`](.github/workflows/) for full configuration.
+
+---
+
+## 🤝 Contributing
+
+Pull requests and issues are welcome! Please follow the existing code style and add tests for new features.
+
+---
+
+## 📄 License
+
+This project is open-sourced software licensed under the [MIT license](./LICENSE).
