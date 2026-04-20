@@ -160,8 +160,8 @@ github.com/goravel/file-rotatelogs/v2 v2.4.2 h1:g68AzbePXcm0V2CpUMc9j4qVzcDn7+7a
 github.com/goravel/file-rotatelogs/v2 v2.4.2/go.mod h1:23VuSW8cBS4ax5cmbV+5AaiLpq25b8UJ96IhbAkdo8I=
 github.com/goravel/framework v1.17.0 h1:a02vTMO7ETQE+fkpfndiNgSXucJKA58qB3nzm+moW6A=
 github.com/goravel/framework v1.17.0/go.mod h1:ClgXBsig8R2w+xAJT2TVxpAkazGHFtvVmNBolYT94gQ=
-github.com/goravel/gin v1.4.0 h1:uc3d40XMIl15puhJvUfh6cT7p39XTpK8biqPJ2WxCRQ=
-github.com/goravel/gin v1.4.0/go.mod h1:8yQxcARDgY4quV1Is4RCw8KjaZrW8GK1URWCSAE/Nzc=
+github.com/goravel/gin v1.17.0 h1:8H66v9GaYJR9UQ7C0VOef25/r8t/BAH9ZxlvxbHprlc=
+github.com/goravel/gin v1.17.0/go.mod h1:n0W6V/H+E0mqO+Gh+UMjeBANZe//lpWJ6X7kF3kwxR8=
 github.com/goravel/mysql v1.17.1 h1:pp0rsIQQ9xdZ5ebsksI3VnrfC4byrjJP7RWLnrAwg2E=
 github.com/goravel/mysql v1.17.1/go.mod h1:07ZhQsHt15tYJZBonyoGP32elzf8dgNLDODNsja0RlE=
 github.com/goravel/redis v1.4.0 h1:y/v9Li2okQ3ASj2+RszEuvH5WpFbNpK0ApgK5BVBSPk=

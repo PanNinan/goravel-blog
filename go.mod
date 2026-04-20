@@ -7,7 +7,7 @@ require (
 	github.com/go-viper/mapstructure/v2 v2.5.0
 	github.com/google/uuid v1.6.0
 	github.com/goravel/framework v1.17.0
-	github.com/goravel/gin v1.4.0
+	github.com/goravel/gin v1.17.0
 	github.com/goravel/mysql v1.17.1
 	github.com/goravel/redis v1.4.0
 	github.com/spf13/cast v1.10.0
